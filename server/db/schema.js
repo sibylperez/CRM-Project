@@ -1,0 +1,150 @@
+const { gql } = require('apollo-server');
+
+//SCHEMA (type definitions)
+const typeDefs = gql`
+
+#### TYPES ####
+
+    #USER
+    type User {
+        id: ID
+        name: String
+        lastName: String
+        email: String
+        dataCreate: String
+    }
+
+    type Token {
+        token: String
+    }
+
+    #PRODUCT
+    type Product {
+        id: ID
+        name: String
+        stock: Int
+        price: Float
+        dataCreate: String
+    }
+
+    #CLIENT
+    type Client {
+        id: ID
+        name: String
+        lastName: String
+        company: String
+        email: String
+        phone: String
+        seller: ID
+        dataCreate: String
+    }
+
+    #ORDER
+    type Order {
+        id: ID
+        order: [OrderGroup]
+        total: Float
+        client: ID
+        seller: ID
+        state: StateOrder
+        dataCreate: String
+    }
+
+    type OrderGroup {
+        id: ID
+        quantity: Int
+    }
+
+#### INPUTS ####
+
+    #USER
+    input UserInput {
+        name: String!
+        lastName: String!
+        email: String!
+        password: String!
+    }
+
+    input AutenticaInput {
+        email: String!
+        password: String!
+    }
+
+    #PRODUCT
+    input ProductInput {
+        name: String!
+        stock: Int!
+        price: Float!
+    }
+
+    #CLIENT
+    input ClientInput {
+        name: String!
+        lastName: String!
+        company: String!
+        email: String!
+        phone: String
+    }
+
+    #ORDER
+    input OrderInput{
+        order: [orderProductInput]
+        total: Float!
+        client: ID!
+        state: StateOrder
+    }
+
+    input orderProductInput {
+        id: ID
+        quantity: Int
+    }
+
+    enum StateOrder {
+        PENDING
+        COMPLETE
+        CANCELLED
+    }
+
+#### QUERYS ####
+
+    type Query {
+
+        #USERS
+        getUserAutenticate(token: String!) : User
+
+        #PRODUCTS
+        getProducts : [Product]
+        getProductById(id: ID!): Product
+
+        #CLIENT
+        getClients: [Client]
+        getClientBySeller: [Client]
+        getClientById(id: ID!): Client
+
+        #ORDER
+    }
+
+#### MUTATIONS ####
+
+    type Mutation {
+
+        #USERS
+        newUser(input: UserInput) : User
+        autenticationUser(input: AutenticaInput) : Token
+
+        #PRODUCTS
+        newProduct(input: ProductInput): Product
+        updateProduct(id: ID!, input: ProductInput): Product
+        deleteProduct(id: ID!): String
+
+        #CLIENT
+        newClient(input: ClientInput) : Client
+        updateClient(id: ID!, input: ClientInput): Client
+        deleteClient(id: ID!): String
+
+        #ORDER
+        newOrder(input: OrderInput): Order
+    }
+`;
+
+module.exports = typeDefs;
