@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Product = require('../models/Product');
 const Client = require('../models/Client');
+const Order = require('../models/Order');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config({path: 'variables.env'})
@@ -82,8 +83,107 @@ const resolvers = {
                console.log(error) 
             }
         },
-        //ORDER:
-        //ORDER:
+        //ORDER: GET ALL ORDERS
+        getOrders: async () => {
+            try {
+                const orders = await Order.find({})
+                return orders
+                
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        //ORDER: GET ORDER BY SELLER
+        getOrderBySeller: async (_, {}, ctx) => {
+            try {
+                const orders = await Order.find({seller: ctx.userVerify.id})
+                return orders
+                
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        //ORDER: GET ORDER BY ID
+        getOrderById: async (_, {id}, ctx) => {
+            //Verify Order exist
+            const order = await Order.findById(id);
+             if(!order){
+                throw new Error ("This order doesn't exist")
+             }
+            //Only the seller can see the order
+            if(order.seller.toString() !== ctx.userVerify.id){
+                throw new Error ("You don't have the credentials to see this order")
+            }
+            //Return the result
+            try {
+                return order
+            } catch (error) {
+               console.log(error) 
+            }
+
+        },
+        //ORDER: GET ORDER BY STATE
+        getOrderByState: async (_, {state}, ctx) =>{
+            const order = await Order.find({seller: ctx.userVerify.id, state});
+
+            return order;
+        },
+        //ADVANCED SEARCHES: TOP CLIENTS
+        topClients: async () => {
+            const clients = await Order.aggregate([
+                { $match: {state: "COMPLETE"} },
+                { $group: {
+                    _id: "$client",
+                    total: { $sum: '$total'}
+                }},
+                {
+                    $lookup: {
+                        from: 'clients',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'client'
+                    }
+                },
+                {
+                    $limit: 5
+                },
+                {
+                    $sort: { total: -1 }
+                }
+            ])
+            return clients
+        },
+        //ADVANCED SEARCHES: TOP SELLER
+        topSellers: async () => {
+            const sellers = await Order.aggregate([
+                { $match: {state: "COMPLETE"} },
+                { $group: {
+                    _id: "$seller",
+                    total: { $sum: '$total'}
+                }},
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'seller'
+                    }
+                },
+                {
+                    $limit: 3
+                },
+                {
+                    $sort: { total: -1 }
+                }
+            ])
+            return sellers
+        },
+        //ADVANCED SEARCHES: GET PRODUCT BY NAME
+        getProductByName: async (_, {text}) =>{
+            const products = await Product.find({$text: {$search: text}}).limit(10)
+
+            return products;
+        }
     },
     Mutation: {
         //USER MUTATION: NEW USER
@@ -222,15 +322,121 @@ const resolvers = {
             }
             //Verify who's seller
             if(client.seller.toString() !== ctx.userVerify.id){
-                throw new Error ("You don't have the credentials to update this client")
+                throw new Error ("You don't have the credentials to delete this client")
             }
             //Delete Client  
             await Client.findOneAndDelete({_id: id})          
             return "This client has been deleted"
         },
-        //ORDER MUTATION:
-        //ORDER MUTATION:
-        //ORDER MUTATION:
+        //ORDER MUTATION: NEW ORDER
+        newOrder: async (_, {input}, ctx) => {
+            
+            const { client } = input //client is ID (check schema)
+            //Verify: Client exist
+            const clientExist = await Client.findById(client)
+            
+            if(!clientExist){
+                throw new Error("This client doesn't exist")
+            }
+
+            //Verify: who's seller
+            if(clientExist.seller.toString() !== ctx.userVerify.id){
+                throw new Error ("You don't have the credentials with this client")
+            }
+
+            //Verify stock available
+            for await(const item of input.order) {
+
+                //ID product
+                const { id } = item;
+                //Find the product
+                const product = await Product.findById(id)
+                //Evalue 
+                if(item.quantity > product.stock){
+                    throw new Error(`The Item: ${product.name} exceeds the available quantity`)
+                } else {
+                    //Modify stock
+                    product.stock = product.stock - item.quantity
+
+                    await product.save()
+                }
+            }
+                // New Order
+                const newOrder = new Order(input);
+                //Assign seller
+                newOrder.seller = ctx.userVerify.id;
+                //Save DB
+                const order = await newOrder.save()
+
+                return order
+
+        },
+        //ORDER MUTATION: UPDATE ORDER
+        updateOrder: async (_, {id, input}, ctx) => {
+
+            const { client } = input;
+
+            //Verify order exist
+            const order = await Order.findById(id);
+
+            if(!order){
+                throw new Error ("This order doesn't exist")
+            }
+
+            //Verify client exist
+            const clientExist = await Client.findById(client)
+
+            if(!clientExist){
+                throw new Error ("This client doesn't exist")
+            }
+
+            //Verify seller
+            if(clientExist.seller.toString() !== ctx.userVerify.id){
+                throw new Error ("You don't have the credentials with this client")
+            }
+            //Verify stock available
+            if(input.order){
+                for await(const item of input.order) {
+    
+                    //ID product
+                    const { id } = item;
+                    //Find the product
+                    const product = await Product.findById(id)
+                    //Evalue 
+                    if(item.quantity > product.stock){
+                        throw new Error(`The Item: ${product.name} exceeds the available quantity`)
+                    } else {
+                        //Modify stock
+                        product.stock = product.stock - item.quantity
+    
+                        await product.save()
+                    }
+                }
+            }
+            //Save DB
+            const orderUpdate = await Order.findOneAndUpdate({_id: id}, input, {new: true});
+            //Save DB
+            return orderUpdate;
+
+        },
+        //ORDER MUTATION: DELETE ORDER
+        deleteOrder: async (_, {id}, ctx) => {
+            //Verify order exist
+            const order = await Order.findById(id)
+
+            if(!order){
+                throw new Error("This order doesn't exist")
+            }
+
+            //Verify seller
+            if(order.seller.toString() !== ctx.userVerify.id){
+                throw new Error ("You don't have the credentials with this order")
+            }
+
+            //Delete order
+            await Order.findOneAndDelete({_id: id});
+            return "This order has been deleted"
+        },
     }
 };
 

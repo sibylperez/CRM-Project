@@ -55,6 +55,17 @@ const typeDefs = gql`
         quantity: Int
     }
 
+    #ADVANCED SEARCHES 
+    type TopClient {
+        total: Float
+        client: [Client]
+    }
+
+    type TopSeller {
+        total: Float
+        seller: [User]
+    }
+
 #### INPUTS ####
 
     #USER
@@ -89,8 +100,8 @@ const typeDefs = gql`
     #ORDER
     input OrderInput{
         order: [orderProductInput]
-        total: Float!
-        client: ID!
+        total: Float
+        client: ID
         state: StateOrder
     }
 
@@ -122,6 +133,15 @@ const typeDefs = gql`
         getClientById(id: ID!): Client
 
         #ORDER
+        getOrders: [Order]
+        getOrderBySeller: [Order]
+        getOrderById(id: ID!): Order
+        getOrderByState(state: String!): [Order]
+
+        #ADVANCED SEARCHES 
+        topClients: [TopClient]
+        topSellers: [TopSeller]
+        getProductByName(text: String!): [Product]
     }
 
 #### MUTATIONS ####
@@ -144,6 +164,8 @@ const typeDefs = gql`
 
         #ORDER
         newOrder(input: OrderInput): Order
+        updateOrder(id: ID!, input: OrderInput): Order
+        deleteOrder(id: ID!): String
     }
 `;
 
