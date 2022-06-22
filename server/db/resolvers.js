@@ -18,7 +18,7 @@ const resolvers = {
     Query: {
         //USERS
         getUserAutenticate: async (_, {}, ctx) => {
-            return ctx
+            return ctx.userVerify
 
             //CODE RECICLE
             // const userId = await jwt.verify(token, process.env.SECRET)
