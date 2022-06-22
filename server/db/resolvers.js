@@ -17,9 +17,12 @@ const createToken = (user, secret, expiresIn) => {
 const resolvers = {
     Query: {
         //USERS
-        getUserAutenticate: async (_, {token}) => {
-            const userId = await jwt.verify(token, process.env.SECRET)
-            return userId
+        getUserAutenticate: async (_, {}, ctx) => {
+            return ctx
+
+            //CODE RECICLE
+            // const userId = await jwt.verify(token, process.env.SECRET)
+            // return userId
         },
 
         //PRODUCT: GET ALL PRODUCTS
