@@ -1,6 +1,9 @@
 import Layout from '../components/Layout';
 import { useQuery, gql } from '@apollo/client';
+import { useRouter } from 'next/router'
 import Loading from '../components/Loading';
+import Link from 'next/link';
+import Table_Client from '../components/Table_Client';
 
 const GET_CLIENTS_SELLER = gql`
 query getClientBySeller {
@@ -18,13 +21,28 @@ query getClientBySeller {
 
 const Index = () => {
 
+  //Routing
+  const router = useRouter()
+
   //Get info from Apollo
   const { data, loading, error } = useQuery(GET_CLIENTS_SELLER);
 
+  if (loading) return 'Loading...';
+
+  //user no authenticated
+  const noAuth = () => {
+    router.push("/login");
+  };
+
+
   return (
     <div>
+      {localStorage.getItem('token') ? 
       <Layout>
         <h1 className='text-[#5B57D4] text-3xl font-medium'>Clients</h1>
+        <Link href='/newclient'>
+          <a className='bg-[#1c1c3c] py-2 px-5 mt-3 inline-block text-white rounded text-sm hover:bg-[#5B57D4] mb-1 font-bold'>Add Client</a>
+        </Link>
         { loading ? 
           <Loading />
         : 
@@ -34,20 +52,23 @@ const Index = () => {
               <th className="w-1/5 py-2">Name</th>
               <th className="w-1/5 py-2">Company</th>
               <th className="w-1/5 py-2">Email</th>
+              <th className="w-1/5 py-2"></th>
             </tr>
           </thead>
           <tbody className="bg-white">
             {data && data?.getClientBySeller.map(client => (
-              <tr key={client.id}>
-                <td className="border px-4 py-2"> {client.name} </td>
-                <td className="border px-4 py-2"> {client.company}</td>
-                <td className="border px-4 py-2"> {client.email} </td>
-              </tr>
+              <Table_Client 
+                key={client.id}
+                client = {client}
+              />
             ))}
           </tbody>
           </table>
         }
       </Layout>
+    : (
+      noAuth()
+    )}
     </div>
   )
 }

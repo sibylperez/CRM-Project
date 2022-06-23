@@ -36,8 +36,8 @@ const Register = () => {
             password: ''
         },
         validationSchema: yup.object({
-            name: yup.string().min(6, 'Name must be at least 6 characters').required("Name is a required field"),
-            lastName: yup.string().min(6, 'Lastname must be at least 6 characters').required("Lastname is a required field"),
+            name: yup.string().min(2, 'Name must be at least 2 characters').required("Name is a required field"),
+            lastName: yup.string().min(3, 'Lastname must be at least 3 characters').required("Lastname is a required field"),
             email: yup.string().email('The email must be a valid email').required("Email is a required field"),
             password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is a required field')
         }),
