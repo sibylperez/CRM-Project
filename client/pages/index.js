@@ -25,7 +25,7 @@ const Index = () => {
   const router = useRouter()
 
   //Get info from Apollo
-  const { data, loading, error } = useQuery(GET_CLIENTS_SELLER);
+  const { data, loading } = useQuery(GET_CLIENTS_SELLER);
 
   if (loading) return 'Loading...';
 

@@ -69,7 +69,6 @@ const Table_Client = ({ client }) => {
                             id
                         }
                     });
-                    console.log(data)
                     //Alert
                     Swal.fire({
                         title: 'Deleted!',

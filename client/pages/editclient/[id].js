@@ -205,7 +205,7 @@ const EditClient = () => {
                             <input 
                             type='submit'
                             className='bg-[#1c1c3c] w-full mt-5 p-2 text-white uppercase hover:bg-[#5B57D4]'
-                            value='Edit Client'
+                            value='Update Client'
                             />
                         </form>
                         )}

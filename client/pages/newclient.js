@@ -37,7 +37,7 @@ const newClient = () => {
     //MUTATION CREATE NEW CLIENT
     const [ newClient ] = useMutation(NEW_CLIENT, {
         //Cache APOLLO
-        update(cache, { data: newClient}) {
+        update(cache, { data: {newClient}}) {
             //Cache object update
             const { getClientBySeller } = cache.readQuery({ query: GET_CLIENTS_SELLER});
 
