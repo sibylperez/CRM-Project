@@ -25,7 +25,7 @@ const SelectProducts = () => {
 
     //QUERY
     const { data, loading } = useQuery(GET_PRODUCTS);
-    console.log(loading)
+    //console.log(loading)
 
     useEffect(() => {
         addProduct(product)
@@ -35,6 +35,7 @@ const SelectProducts = () => {
     const selectOneProduct = products => {
         setProduct(products)
     }
+
     if(loading) return 'Loading...'
 
     const { getProducts } = data

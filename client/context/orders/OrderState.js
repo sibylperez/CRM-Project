@@ -27,10 +27,32 @@ const OrderState = ({children}) => {
         })
     }
     //Add product in Order
-    const addProduct = product => {
+    const addProduct = productAdd => {
+        //Updated state
+        let newState;
+        if(state.product.length > 0){
+            newState = productAdd.map(product => {
+                const newProduct = state.product.find(productState => productState.id === product.id)
+                return{
+                    ...product,
+                    ...newProduct
+                }
+            })
+
+        } else {
+            newState = productAdd
+        };
+
         dispatch({
             type: SELECT_PRODUCT,
-            payload: product
+            payload: newState
+        })
+    }
+    //Change quantity in product
+    const quantityProduct = newProduct => {
+        dispatch({
+            type: QUANTITY_PRODUCT,
+            payload: newProduct
         })
     }
 
@@ -38,8 +60,10 @@ const OrderState = ({children}) => {
     return (
         <OrderContext.Provider
             value={{
+                product: state.product,
                 addClient,
-                addProduct
+                addProduct,
+                quantityProduct
             }}
         >
             {children}

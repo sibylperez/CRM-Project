@@ -28,17 +28,17 @@ const SelectClient = () => {
 
     //QUERY
     const { data, loading } = useQuery(GET_CLIENTS_SELLER);
-    console.log(loading);
     //
     useEffect(() => {
         addClient(client)
     }, [client])
-
+    
     //Function select
     const selectOneClient = clients => {
         setClient(clients)
     }
-
+    
+    if(loading) return 'Loading...'
 
     const { getClientBySeller } = data
 
