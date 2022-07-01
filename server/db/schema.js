@@ -53,6 +53,8 @@ const typeDefs = gql`
     type OrderGroup {
         id: ID
         quantity: Int
+        name: String
+        price: Float
     }
 
     #ADVANCED SEARCHES 
@@ -108,6 +110,8 @@ const typeDefs = gql`
     input orderProductInput {
         id: ID
         quantity: Int
+        name: String
+        price: Float
     }
 
     enum StateOrder {
