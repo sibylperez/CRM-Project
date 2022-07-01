@@ -1,7 +1,8 @@
 import {
     SELECT_CLIENT,
     SELECT_PRODUCT,
-    QUANTITY_PRODUCT
+    QUANTITY_PRODUCT,
+    UPDATE_TOTAL
 } from '../../types'
 
 export default (state, action) => {
@@ -25,6 +26,13 @@ export default (state, action) => {
                     product
                 )
             };
+        case UPDATE_TOTAL:
+            return {
+                ...state,
+                total: state.product.reduce(
+                    (newTotal, item) => newTotal += item.price * item.quantity, 0
+                )
+            }
         default:
             return state
     }

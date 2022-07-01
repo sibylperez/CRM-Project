@@ -7,13 +7,14 @@ const ResumenProduct = ({products}) => {
 
     //CONTEXT
     const ordercontext = useContext(OrderContext);
-    const { quantityProduct } = ordercontext
+    const { quantityProduct, updateTotal } = ordercontext
 
     //LOCAL STATE
     const [quantity,  setQuantity] = useState(0);
 
     useEffect(() => {
       updateQuantity()
+      updateTotal()
     }, [quantity])
 
     //UPDATE QUANTITY

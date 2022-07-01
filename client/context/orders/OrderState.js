@@ -5,7 +5,8 @@ import OrderReducer from "./OrderReducer";
 import {
     SELECT_CLIENT,
     SELECT_PRODUCT,
-    QUANTITY_PRODUCT
+    QUANTITY_PRODUCT,
+    UPDATE_TOTAL
 } from '../../types'
 
 const OrderState = ({children}) => {
@@ -55,15 +56,24 @@ const OrderState = ({children}) => {
             payload: newProduct
         })
     }
+    //Update total
+    const updateTotal = () => {
+        dispatch({
+            type: UPDATE_TOTAL
+        })
+    }
 
 
     return (
         <OrderContext.Provider
             value={{
+                client: state.client,
                 product: state.product,
+                total: state.total,
                 addClient,
                 addProduct,
-                quantityProduct
+                quantityProduct,
+                updateTotal
             }}
         >
             {children}
