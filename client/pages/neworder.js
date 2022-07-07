@@ -18,6 +18,29 @@ mutation newOrder($input: OrderInput){
   }
 `;
 
+const GET_ORDER_BY_SELLER = gql`
+query getOrderBySeller{
+  getOrderBySeller {
+    id
+    order { 
+      id
+      quantity
+      name
+    }
+    total
+    client {
+      id
+      name
+      lastName
+      email
+      phone
+    }
+    seller
+    state
+  }
+}
+`
+
 
 const NewOrder = () => {
     //READING CONTEXT
@@ -25,7 +48,19 @@ const NewOrder = () => {
     const { client, product, total } = ordercontext
     
     //MUTATION
-    const [ newOrder ] = useMutation(NEW_ORDER)
+    const [ newOrder ] = useMutation(NEW_ORDER, {
+        update(cache, { data : { newOrder }} ){
+            const { getOrderBySeller } = cache.readQuery({
+                query: GET_ORDER_BY_SELLER
+            });
+            cache.writeQuery({
+                query: GET_ORDER_BY_SELLER,
+                data: {
+                    getOrderBySeller: [...getOrderBySeller, newOrder]
+                }
+            })
+        }
+    })
 
     //Routing
     const router = useRouter();

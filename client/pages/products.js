@@ -18,7 +18,7 @@ query getProducts {
 const Products = () => {
 
   //Get info from Apollo
-  const { data, loading, error } = useQuery(GET_PRODUCTS);
+  const { data, loading } = useQuery(GET_PRODUCTS);
   console.log(loading)
 
   return (
