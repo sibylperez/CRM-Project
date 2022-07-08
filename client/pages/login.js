@@ -47,11 +47,13 @@ const Login = () => {
                         }
                     }
                 });
-                //Saving token in localStorage
-                const token = data.autenticationUser.token;
+               
+                setTimeout(() => {
+                     //Saving token in localStorage
+                    const token = data.autenticationUser.token;
+                    localStorage.setItem('token', token)
+                }, 1000);
                 
-                localStorage.setItem('token', token)
-
                 //Message to sucess
                 Swal.fire({
                     title: 'Authenticating...', 

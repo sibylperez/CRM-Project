@@ -37,8 +37,8 @@ const Header = () => {
     }
 
     return (
-        <div className="flex justify-between mb-6">
-            <p className="mr-2"><b>Hello {name.toUpperCase()} {lastName.toUpperCase()}</b></p>
+        <div className="sm:flex sm:justify-between mb-6">
+            <p className="mr-2 mb-5 lg:mb-0"><b>Hello {name.toUpperCase()} {lastName.toUpperCase()}</b></p>
             <button 
                 onClick={() => logOut()}
                 type="button"
